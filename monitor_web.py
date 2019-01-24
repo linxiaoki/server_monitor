@@ -16,9 +16,8 @@ def Jianlai2dict(obj):
         'chapCount': obj.chapCount
     }
 '''
-
+path=''
 def init():
-    path=os.path.abspath('.')
     url='http://book.zongheng.com/showchapter/672340.html'
     response=requests.get(url)
     selector=html.fromstring(response.content)
@@ -30,7 +29,6 @@ def init():
         json.dump(d1,f)
 
 def test_jianlai():
-    path=os.path.abspath('.')
     mail_JianLai=mailpy.Email('kisaname@sina.com')
     url='http://book.zongheng.com/showchapter/672340.html'
     response=requests.get(url)
@@ -45,10 +43,12 @@ def test_jianlai():
         d1["lastTitle"]=lastTitle
         with open(path+'/temp.txt','w') as f:
             json.dump(d1,f)
-        mail_JianLai.send_Email('剑来更新了',lastTitle)
+    mail_JianLai.send_Email('剑来更新了',lastTitle)
 
 if __name__=='__main__':
     path=os.path.abspath('.')
+    if path=='/root':   #自动运行脚本时 相对路径为/root
+        path='/opt/git_py/server_monitor'
     if not os.path.isfile(path+"/temp.txt"):
         init()
     test_jianlai()
