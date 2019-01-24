@@ -2,7 +2,7 @@ import requests
 from lxml import html
 import json
 import os
-import send_email
+import mailpy
 
 '''
 class Jianlai(object):
@@ -31,7 +31,7 @@ def init():
 
 def test_jianlai():
     path=os.path.abspath('.')
-    mail_JianLai=send_email.Email('kisaname@sina.com')
+    mail_JianLai=mailpy.Email('kisaname@sina.com')
     url='http://book.zongheng.com/showchapter/672340.html'
     response=requests.get(url)
     selector=html.fromstring(response.content)
