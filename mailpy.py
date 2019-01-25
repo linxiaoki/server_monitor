@@ -36,7 +36,7 @@ class Email(object):
     def send_Email(self,title,txt=''):
         self.msg.attach(MIMEText(txt,'plain','utf-8'))
         self.msg['Subject']=Header(title)
-        server=smtplib.SMTP('smtp.126.com',25)   #!!!!!!!!!!!!!!!!!!非固定
+        server=smtplib.SMTP_SSL('smtp.'+self.from_addr.split('@')[1],465)   #!!!!!!!!!!!!!!!!!!非固定
         #server.set_debuglevel(1)
         server.login(self.from_addr,self.password)
         server.sendmail(self.from_addr,self.to_addr,self.msg.as_string())
