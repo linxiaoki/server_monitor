@@ -6,7 +6,9 @@ import random
 #pip install fake-useragent
 def get_proxyip_json():
     # 代理
-    proxyurl='https://proxyscrape.com/api?request=getproxies&proxytype=http&timeout=50&country=GB&ssl=all&anonymity=all'
+    #proxyurl='https://proxyscrape.com/api?request=getproxies&proxytype=http&timeout=50&country=GB&ssl=all&anonymity=all'
+    #proxyurl='https://proxyscrape.com/api?request=getproxies&proxytype=socks4&timeout=50&country=all'
+    proxyurl='https://proxyscrape.com/api?request=getproxies&proxytype=socks5&timeout=200&country=all'
     try:
         ua=UserAgent(verify_ssl=False)    #veriify_ssl  是否验证服务器的SSL证书
         headers={"User-Agent":ua.random}
@@ -27,6 +29,7 @@ if __name__=="__main__":
     json_proxy=get_proxyip_json()
     proxies_someone=random.choice(json_proxy)
     print('begin test:'+proxies_someone)
-    proxies={"http":random.choice(proxies_someone)}
+    #proxies={"http":proxies_someone}
+    proxies={"socket5":proxies_someone}
     response=requests.get("http://www.baidu.com",headers=headers,proxies=proxies)
-    print(response.text)
+    print('complete')

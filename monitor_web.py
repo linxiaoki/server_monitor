@@ -73,7 +73,7 @@ if __name__=='__main__':
     
     #保存参数,避免不断存取，更新时需要更新
     args1=[d_tmp["jianlai"]["chapCount"],d_tmp["weixinso_liubei"]["lastTitle"]]
-    while(True):
+    while(False):
         test_jianlai(d_tmp,args1[0])   #  剑来
         test_weixinso1(d_tmp)  #公众号 刘备教授
         time.sleep(10)
