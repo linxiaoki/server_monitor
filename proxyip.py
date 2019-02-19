@@ -1,3 +1,4 @@
+!#/usr/bin/env python3 
 import requests
 from fake_useragent import UserAgent
 import json
