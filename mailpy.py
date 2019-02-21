@@ -8,6 +8,7 @@ import sys
 import proxyip
 import socks
 import socket
+
 #手机收邮件   一个title会归于一个会话
 class Email(object):
     def __init__(self,to_addr,from_addr='kisaname@126.com',pwd='MIMA123'):
@@ -25,6 +26,7 @@ class Email(object):
 
     def set_Toaddrs(self,to_addr):
         self.to_addr=to_addr
+    
     def set_Fromaddr(self,from_addr,pwd):
         self.from_addr=from_addr
         self.password=pwd
@@ -40,8 +42,8 @@ class Email(object):
         self.msg.attach(MIMEText(txt,'plain','utf-8'))
         self.msg['Subject']=Header(title)
         print(self.from_addr)
-        #server=smtplib.SMTP_SSL('smtp.'+self.from_addr.split('@')[1],465)
-        server=smtplib.SMTP('smtp.'+self.from_addr.split('@')[1],587,timeout=120)
+        server=smtplib.SMTP_SSL('smtp.'+self.from_addr.split('@')[1],465)
+        #server=smtplib.SMTP('smtp.'+self.from_addr.split('@')[1],587,timeout=120)
         #server.set_debuglevel(1)
         server.login(self.from_addr,self.password)
         server.sendmail(self.from_addr,self.to_addr,self.msg.as_string())
@@ -57,45 +59,28 @@ class Email(object):
         self.initMsg()
         return
 
-'''
-    def send_Test(self,txt=''):  #msg=self.msg    self不更改
-        self.msg.attach(MIMEText('绑定self的信息，看出现几次','plain','utf-8'))
-        msg=self.msg
-        msg.attach(MIMEText('没绑定self的信息','plain','utf-8'))
-        msg['Subject']=Header('出现错误')
-        server=smtplib.SMTP('smtp.126.com',25)   #!!!!!!!!!!!!!!!!!!非固定
-        #server.set_debuglevel(1)
-        server.login(self.from_addr,self.password)
-        server.sendmail(self.from_addr,self.to_addr,msg.as_string())
-        server.quit()
-'''
-
 def format_addr(s):
     name, addr = parseaddr(s)
     return formataddr((Header(name, "utf-8").encode(), addr))
 
-if __name__=='__main__':    
-    #em1=Email('kisaname@126.com','MIMA123','kisaname@sina.com') 
-    
+if __name__=='__main__':
+    #测试用   
     em1=Email('1358109029@qq.com');  #email 添加初始值
-    #em1=Email('1358109029@qq.com','keename@sina.com','MEIYOUSINA') 
     msgtxt='剑来章节更新了，第四百七十五章'
     #msgtxt=sys.stdin.read()
     #em1.send_Test()
-
-    #proxyhost,proxyip=proxyip.get_proxyip().split(':')
-    #proxyhost,proxyip="91.134.134.69:1080".split(':')  #socket4
-    #socks.set_default_proxy(socks.PROXY_TYPE_SOCKS5,proxyhost,int(proxyip))
-    #socks.wrapmodule(smtplib)
-    #print(proxyhost+':'+proxyip)
-    em1.send_Email('服务器通知剑来更新了',msgtxt)
-'''
+    _socket=socket.socket
     try:
-        proxyhost,proxyip=proxyip.get_proxyip().sBplit(':')
-        socks.set_default_proxy(socks.HTTP,addr="'"+proxyhost+"'",port=proxyip)
+        proxyhost,proxyip=proxyip.get_proxyip(proxytype='socket5').split(':')
+        socks.set_default_proxy(socks.PROXY_TYPE_SOCKS5,proxyhost,int(proxyip))
+        #socks.wrapmodule(smtplib)   #局部更新代理
         socket.socket=socks.socksocket
-        print(proxyhost)
-        em1.send_Email('服务器通知',msgtxt)
+        print(proxyhost+':'+proxyip)
+        em1.send_Email('服务器通知剑来更新了',msgtxt)
     except Exception as e:
-        em1.send_Fail(str(e))
-'''
+        try:
+            em1.send_Fail(str(e))
+        except Exception as e2:
+            socket.socket=_socket
+            em1=Email('1358109029@qq.com','keename@sina.com','MEIYOUSINA')
+            em1.send_Fail("使用代理发送邮件错误")
