@@ -9,7 +9,6 @@ import mailpy
 import proxyip
 from datetime import datetime
 
-
 '''  
 class Jianlai(object):
     def __init__(self,name,chapCount):
@@ -93,6 +92,7 @@ if __name__=='__main__':
     with open(path+'/temp.json','r') as f:
         d_last=json.load(f)
     print('begin loop:')
+    nowstamp=datetime.now().timestamp()
     while True:
         d_tmp=monitor_web(d_last)
         if d_tmp:       #实时更新
@@ -100,4 +100,6 @@ if __name__=='__main__':
             with open(path+'/temp.json','w') as f:
                 json.dump(d_last,f)
         time.sleep(5)
- 
+        if(datetime.now().timestamp()-nowstamp>28800):
+            print(datetime.now().strftime('%a, %b %d %H:%M'))
+            break
