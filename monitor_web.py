@@ -51,7 +51,8 @@ def init():
     with open(path+'/temp.json','w') as f:
         json.dump(d0,f)
 
-def test_jianlai(d1,timewait=6):
+# 监测：剑来
+def test_jianlai(d1):
     mail_user=mailpy.Email('1358109029@qq.com','keename@sina.com','MEIYOUSINA')
     url='http://book.zongheng.com/showchapter/672340.html'
     response=requests.get(url)
@@ -72,35 +73,31 @@ def test_jianlai(d1,timewait=6):
 #def savenote(url):
     #send_Email(title,url,save@note.youdao.com)
 
-#timeawait:等待时间   d_tmp:最新
-def monitor_web(d_tmp,timeawait=5):
-    d1=test_jianlai(d_tmp["jianlai"])
-    #d2=test_other(d_tmp["other"])
-    if d1!=None:
-        d_tmp={"jianlai":d1}   #d_tmp={d1,d2....}
-        with open(path+'/temp.json','w') as f:
-            json.dump(d_tmp,f)
-    time.sleep(timeawait)
-    monitor_web(d_tmp,timeawait)
+#监测：汇总
+def monitor_web(d_last):
+    d1=test_jianlai(d_last["jianlai"])
+    #d2=test_other(d_last["other"])
+    if d1:
+        d_last={"jianlai":d1}   #d_last={d1,d2....}
+        return d_last
+    return None
+ 
 
 if __name__=='__main__':
     path=os.path.abspath('.')
-    if path=='/root':   #自动运行脚本时 相对路径为/root
+    if path=='/root':   #自动运行脚本时 centos7相对路径为/root
         path='/opt/git_py/server_monitor'
     if not os.path.isfile(path+"/temp.json"):
         init()
 
     with open(path+'/temp.json','r') as f:
-        d_tmp=json.load(f)
-        print(d_tmp)
-    print('begin loop:')    #提示信息
-
-    monitor_web(d_tmp)   #迭代有次数限制
-
-    '''
-    #问题，循环时d_tmp更新了
-    with open(path+'/temp.json','r') as f:
-        while False:
-            test_jianlai(json.load(f))    #实时更新
-            #test_other()
-    '''
+        d_last=json.load(f)
+    print('begin loop:')
+    while True:
+        d_tmp=monitor_web(d_last)
+        if d_tmp:       #实时更新
+            d_last=d_tmp
+            with open(path+'/temp.json','w') as f:
+                json.dump(d_last,f)
+        time.sleep(5)
+ 
