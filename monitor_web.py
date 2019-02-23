@@ -93,13 +93,17 @@ if __name__=='__main__':
         d_last=json.load(f)
     print('begin loop:')
     nowstamp=datetime.now().timestamp()
-    while True:
-        d_tmp=monitor_web(d_last)
-        if d_tmp:       #实时更新
-            d_last=d_tmp
-            with open(path+'/temp.json','w') as f:
-                json.dump(d_last,f)
-        time.sleep(5)
-        if(datetime.now().timestamp()-nowstamp>28800):
-            print(datetime.now().strftime('%a, %b %d %H:%M'))
-            break
+    mail_error=mailpy.Email('1358109029@qq.com','keename@sina.com','MEIYOUSINA')
+    try:
+        while True:
+            d_tmp=monitor_web(d_last)
+            if d_tmp:       #实时更新
+                d_last=d_tmp
+                with open(path+'/temp.json','w') as f:
+                    json.dump(d_last,f)
+            time.sleep(5)
+            if(datetime.now().timestamp()-nowstamp>32400):
+                print(datetime.now().strftime('%a, %b %d %H:%M'))
+                break
+    except Exception as e1:
+        mail_error.send_Email("monitor_web 运行出错",str(e1))
