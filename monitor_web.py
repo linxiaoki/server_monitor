@@ -94,8 +94,9 @@ if __name__=='__main__':
     print('begin loop:')
     nowstamp=datetime.now().timestamp()
     mail_error=mailpy.Email('1358109029@qq.com','keename@sina.com','MEIYOUSINA')
-    try:
-        while True:
+    sleeptm=10
+    while True:
+        try:
             d_tmp=monitor_web(d_last)
             if d_tmp:       #实时更新
                 d_last=d_tmp
@@ -105,5 +106,7 @@ if __name__=='__main__':
             if(datetime.now().timestamp()-nowstamp>32400):
                 print(datetime.now().strftime('%a, %b %d %H:%M'))
                 break
-    except Exception as e1:
-        mail_error.send_Email("monitor_web 运行出错",str(e1))
+        except Exception as e1:
+            sleeptm=sleeptm*2
+            time.sleep(sleeptm)
+            mail_error.send_Email("monitor_web 运行出错",str(e1))
