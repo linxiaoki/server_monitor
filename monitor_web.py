@@ -8,7 +8,7 @@ from fake_useragent import UserAgent
 import mailpy
 import proxyip
 from datetime import datetime
-
+import random
 
 '''  
 class Jianlai(object):
@@ -31,10 +31,10 @@ def get_url(url,isuseproxy=False,proxies=None):
         proxies=proxyip.get_proxyip()
     #proxies={'http':'socks5://'+proxies_someone,'https':'socks5://'+proxies_someone}  # 没试过
     #proxies={'socket5':proxies_someone}
-    proxies={"http":proxies}
-    proxies={"http":proxies,"Connection":'close'}   #  不需要默认的keep-alive
+    proxies={"http":proxies,"Connection":"close"}  # keep-alive:false  测试 
     response=requests.get(url,headers=headers,proxies=proxies)
     return response
+
 
 def init():
     #剑来
@@ -53,9 +53,9 @@ def init():
 def test_jianlai(d1,proxies):
     mail_user=mailpy.Email('1358109029@qq.com','keename@sina.com','MEIYOUSINA')
     url='http://book.zongheng.com/showchapter/672340.html'
-    proxies={"http":proxies}
+    #proxies={"http":proxies}
     #response=requests.get(url,proxies=proxies)
-    response=get_url(url,proxies)   # keep-alive   close!
+    response=get_url(url,proxies=proxies)   # keep-alive   close!
     selector=html.fromstring(response.content)
     chap=selector.xpath('/html/body/div[3]/div[2]/div[2]/div/ul[@class="chapter-list clearfix"]/li')
     lastTitle=selector.xpath('/html/body/div[3]/div[2]/div[2]/div/ul[@class="chapter-list clearfix"]/li/a/text()')
@@ -76,7 +76,7 @@ def test_jianlai(d1,proxies):
 # Loop
 def loop_monitor(nowstamp):
     proxies=proxyip.get_proxyip()
-    print(proxies)
+    print('    '+proxies)
     with open(path+'/temp.json','r') as f:
         d_last=json.load(f)
     while True:
@@ -90,7 +90,7 @@ def loop_monitor(nowstamp):
                 d_last=d_tmp
                 with open(path+'/temp.json','w') as f:
                     json.dump(d_last,f)
-            time.sleep(5)
+            time.sleep(random.randint(9,15))
         except Exception as e1:
             return str(e1)
 
@@ -104,11 +104,14 @@ if __name__=='__main__':
     print('begin loop:')
     nowstamp=datetime.now().timestamp()
     mail_error=mailpy.Email('1358109029@qq.com','keename@sina.com','MEIYOUSINA')
+    errortimes=0
     while True:
         errormsg=loop_monitor(nowstamp)
         if not(errormsg):
+            print('    错误次数：'+str(errortimes))
+            print('运行结束'.center(20,'-'))
             break
-        print(errormsg)
-        url='http://book.zongheng.com/showchapter/672340.html'
-        time.sleep(5)
-        mail_error.send_Email("monitor_web 运行出错",errormsg)
+        errortimes+=1
+        print('    '+errormsg)
+        #url='http://book.zongheng.com/showchapter/672340.html'
+        #mail_error.send_Email("monitor_web 运行出错",errormsg)
