@@ -35,6 +35,10 @@ def get_url(url,isuseproxy=False,proxies=None):
     response=requests.get(url,headers=headers,proxies=proxies)
     return response
 
+def output1(prstr):
+    time1=('     '+datetime.now().strftime('%a, %b %d %H:%M'))
+    with open('/opt/git_py/server_monitor/result.txt','a') as f:
+        f.write(prstr+time1+'\n')
 
 def init():
     #剑来
@@ -45,7 +49,7 @@ def init():
     lastTitle=selector.xpath('/html/body/div[3]/div[2]/div[2]/div/ul[@class="chapter-list clearfix"]/li/a/text()')
     lastTitle=lastTitle[-1]
     d1={"name":"剑来","chapCount":len(chap),"lastTitle":lastTitle}
-
+    d0={"jianlai":d1}
     with open(path+'/temp.json','w') as f:
         json.dump(d0,f)
 
@@ -61,37 +65,43 @@ def test_jianlai(d1,proxies):
     lastTitle=selector.xpath('/html/body/div[3]/div[2]/div[2]/div/ul[@class="chapter-list clearfix"]/li/a/text()')
     lastTitle=lastTitle[-1]
     chapCount=d1["chapCount"]
-    if chapCount !=len(chap):
+    if chapCount < len(chap):
         d1["chapCount"]=len(chap)
         d1["lastTitle"]=lastTitle
         mail_user.send_Email('剑来更新了',lastTitle)
-        print('    今天剑来更新:'+lastTitle+'('+datetime.now().strftime("%a, %b %d %H:%M")+')')
+        output1('    今天剑来更新:'+lastTitle+'('+datetime.now().strftime("%a, %b %d %H:%M")+')')
         return d1
     return None
-
 
 #def savenote(url):
     #send_Email(title,url,save@note.youdao.com)
 
 # Loop
 def loop_monitor(nowstamp):
+    output1('    begin loop_monitor')
     proxies=proxyip.get_proxyip()
-    print('    '+proxies)
+    output1('    '+proxies)
     with open(path+'/temp.json','r') as f:
         d_last=json.load(f)
     while True:
         try:
-            if(datetime.now().timestamp()-nowstamp>32400):
-                print(datetime.now().strftime('%a, %b %d %H:%M'))
+            if(datetime.now().timestamp()-nowstamp>28000):
+                output1(datetime.now().strftime('%a, %b %d %H:%M'))
                 return None
+            deltime=(datetime.now().timestamp()-nowstamp)%3600
+            if(deltime<16):
+                output1("         我在运行中哦")
+            output1('       begin test_jianlai')
             d1=test_jianlai(d_last["jianlai"],proxies)
             if d1:
                 d_tmp={"jianlai":d1}   #d_last={d1,d2....}
                 d_last=d_tmp
                 with open(path+'/temp.json','w') as f:
                     json.dump(d_last,f)
+            output1('        time.sleep')
             time.sleep(random.randint(9,15))
         except Exception as e1:
+            output1('       loop_monitor->loop->catch error')
             return str(e1)
 
 if __name__=='__main__':
@@ -101,17 +111,18 @@ if __name__=='__main__':
     if not os.path.isfile(path+"/temp.json"):
         init()
 
-    print('begin loop:')
+    output1('begin loop:')
     nowstamp=datetime.now().timestamp()
     mail_error=mailpy.Email('1358109029@qq.com','keename@sina.com','MEIYOUSINA')
     errortimes=0
     while True:
         errormsg=loop_monitor(nowstamp)
+        output1('loop_monitor done')
         if not(errormsg):
-            print('    错误次数：'+str(errortimes))
-            print('运行结束'.center(20,'-'))
+            output1('    错误次数：'+str(errortimes))
+            output1('运行结束'.center(20,'-'))
             break
         errortimes+=1
-        print('    '+errormsg)
+        output1('    '+errormsg)
         #url='http://book.zongheng.com/showchapter/672340.html'
         #mail_error.send_Email("monitor_web 运行出错",errormsg)
