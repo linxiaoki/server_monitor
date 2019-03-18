@@ -21,6 +21,7 @@ def Jianlai2dict(obj):
         'chapCount': obj.chapCount
     }
 '''
+#'''
 
 path=''
 # isuseproxy=True  则随机生成代理
@@ -35,10 +36,6 @@ def get_url(url,isuseproxy=False,proxies=None):
     response=requests.get(url,headers=headers,proxies=proxies)
     return response
 
-def output1(prstr):
-    time1=('     '+datetime.now().strftime('%a, %b %d %H:%M'))
-    with open('/opt/git_py/server_monitor/result.txt','a') as f:
-        f.write(prstr+time1+'\n')
 
 def init():
     #剑来
@@ -69,39 +66,53 @@ def test_jianlai(d1,proxies):
         d1["chapCount"]=len(chap)
         d1["lastTitle"]=lastTitle
         mail_user.send_Email('剑来更新了',lastTitle)
-        output1('    今天剑来更新:'+lastTitle+'('+datetime.now().strftime("%a, %b %d %H:%M")+')')
+        print('    今天剑来更新:'+lastTitle+'('+datetime.now().strftime("%a, %b %d %H:%M")+')')
         return d1
     return None
 
+def get_jlChapcount(proxies):
+    url='http://book.zongheng.com/showchapter/672340.html'
+    response=get_url(url,proxies=proxies)   # keep-alive   close!
+    selector=html.fromstring(response.content)
+    chap=selector.xpath('/html/body/div[3]/div[2]/div[2]/div/ul[@class="chapter-list clearfix"]/li')
+    lastTitle=selector.xpath('/html/body/div[3]/div[2]/div[2]/div/ul[@class="chapter-list clearfix"]/li/a/text()')
+    lastTitle=lastTitle[-1]+"  "+str(len(lastTitle))
+    return lastTitle
+
+# 保存笔记到有道云
 #def savenote(url):
     #send_Email(title,url,save@note.youdao.com)
 
 # Loop
 def loop_monitor(nowstamp):
-    output1('    begin loop_monitor')
-    proxies=proxyip.get_proxyip()
-    output1('    '+proxies)
-    with open(path+'/temp.json','r') as f:
-        d_last=json.load(f)
+    try:
+        proxies=proxyip.get_proxyip()
+        print('    '+proxies)
+        with open(path+'/temp.json','r') as f:
+            d_last=json.load(f)
+    except Exception as e1:
+        print('    loop_monitor->loop->catch error0')
+        return str(e1)
     while True:
         try:
+            #间隔一段时间输出日志
             if(datetime.now().timestamp()-nowstamp>28000):
-                output1(datetime.now().strftime('%a, %b %d %H:%M'))
+                print(datetime.now().strftime('%a, %b %d %H:%M'))
                 return None
             deltime=(datetime.now().timestamp()-nowstamp)%3600
-            if(deltime<16):
-                output1("         我在运行中哦")
-            output1('       begin test_jianlai')
+            if(deltime<18):
+                print("          我在运行中哦")
+                print("          "+get_jlChapcount(proxies))
+                print("          "+d_last["jianlai"]["lastTitle"]+"  "+str(d_last["jianlai"]["chapCount"]))
             d1=test_jianlai(d_last["jianlai"],proxies)
             if d1:
                 d_tmp={"jianlai":d1}   #d_last={d1,d2....}
                 d_last=d_tmp
                 with open(path+'/temp.json','w') as f:
                     json.dump(d_last,f)
-            output1('        time.sleep')
             time.sleep(random.randint(9,15))
         except Exception as e1:
-            output1('       loop_monitor->loop->catch error')
+            print('    loop_monitor->loop->catch error')
             return str(e1)
 
 if __name__=='__main__':
@@ -111,18 +122,18 @@ if __name__=='__main__':
     if not os.path.isfile(path+"/temp.json"):
         init()
 
-    output1('begin loop:')
+    print('begin loop:')
     nowstamp=datetime.now().timestamp()
     mail_error=mailpy.Email('1358109029@qq.com','keename@sina.com','MEIYOUSINA')
     errortimes=0
     while True:
         errormsg=loop_monitor(nowstamp)
-        output1('loop_monitor done')
+        print('loop_monitor done')
         if not(errormsg):
-            output1('    错误次数：'+str(errortimes))
-            output1('运行结束'.center(20,'-'))
+            print('    错误次数：'+str(errortimes))
+            print('运行结束'.center(20,'-'))
             break
         errortimes+=1
-        output1('    '+errormsg)
+        print('    '+errormsg)
         #url='http://book.zongheng.com/showchapter/672340.html'
         #mail_error.send_Email("monitor_web 运行出错",errormsg)
