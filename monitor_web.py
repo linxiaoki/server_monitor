@@ -104,6 +104,7 @@ def loop_monitor(nowstamp):
                 print("          我在运行中哦")
                 print("          "+get_jlChapcount(proxies))
                 print("          "+d_last["jianlai"]["lastTitle"]+"  "+str(d_last["jianlai"]["chapCount"]))
+                print("          "+datetime.now().strftime('%a, %b %d %H:%M'))
             d1=test_jianlai(d_last["jianlai"],proxies)
             if d1:
                 d_tmp={"jianlai":d1}   #d_last={d1,d2....}
