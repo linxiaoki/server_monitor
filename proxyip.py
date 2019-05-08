@@ -8,11 +8,13 @@ import random
 def get_proxyip_json(proxytype='http'):
     # 代理
     if proxytype=='http':
-        proxyurl='https://proxyscrape.com/api?request=getproxies&proxytype=http&timeout=50&country=GB&ssl=all&anonymity=all'
+        proxyurl='https://api.proxyscrape.com/?request=getproxies&proxytype=http&timeout=50&country=GB&ssl=all&anonymity=all'
     elif proxytype=='socket4':
-        proxyurl='https://proxyscrape.com/api?request=getproxies&proxytype=socks4&timeout=100&country=all'
+                #https://api.proxyscrape.com/?request=getproxies&proxytype=socks4&timeout=250&country=all
+        proxyurl='https://api.proxyscrape.com/?request=getproxies&proxytype=socks4&timeout=100&country=all'
     else:  #socket5
-        proxyurl='https://proxyscrape.com/api?request=getproxies&proxytype=socks5&timeout=150&country=all'
+                 #https://api.proxyscrape.com/?request=getproxies&proxytype=socks5&timeout=100&country=all
+        proxyurl='https://api.proxyscrape.com/?request=getproxies&proxytype=socks5&timeout=150&country=all'
     try:
         ua=UserAgent()    # verify_ssl=False   veriify_ssl  是否验证服务器的SSL证书
         headers={"User-Agent":ua.random}
