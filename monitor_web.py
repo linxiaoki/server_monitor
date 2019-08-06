@@ -52,7 +52,8 @@ def init():
 
 # 监测：剑来
 def test_jianlai(d1,proxies):
-    mail_user=mailpy.Email('1358109029@qq.com','keename@sina.com','MEIYOUSINA')
+    mail_user=mailpy.Email(['1358109029@qq.com'],'keename@sina.com','MEIYOUSINA')
+    #mail_user=mailpy.Email(['1358109029@qq.com','1225517060@qq.com'],'keename@sina.com','MEIYOUSINA')
     url='http://book.zongheng.com/showchapter/672340.html'
     #proxies={"http":proxies}
     #response=requests.get(url,proxies=proxies)
@@ -62,6 +63,7 @@ def test_jianlai(d1,proxies):
     lastTitle=selector.xpath('/html/body/div[3]/div[2]/div[2]/div/ul[@class="chapter-list clearfix"]/li/a/text()')
     lastTitle=lastTitle[-1]
     chapCount=d1["chapCount"]
+    print(chapCount)
     if chapCount < len(chap):
         d1["chapCount"]=len(chap)
         d1["lastTitle"]=lastTitle
@@ -116,6 +118,29 @@ def loop_monitor(nowstamp):
             print('    loop_monitor->loop->catch error')
             return str(e1)
 
+def loop_monitor_():
+    try:
+        proxies=proxyip.get_proxyip()
+        print('    '+proxies)
+        with open(path+'/temp.json','r') as f:
+            d_last=json.load(f)
+    except Exception as e1:
+        print('    loop_monitor->loop->catch error-> proxy')
+        return str(e1)
+    while True:
+        try:
+            print('test jianlai')
+            d1=test_jianlai(d_last["jianlai"],proxies)
+            if d1:
+                d_tmp={"jianlai":d1}   #d_last={d1,d2....}
+                d_last=d_tmp
+                with open(path+'/temp.json','w') as f:
+                    json.dump(d_last,f)
+            time.sleep(random.randint(9,15))
+        except Exception as e1:
+            print('    loop_monitor->loop->catch error->test_jianlai')
+            return str(e1)
+
 if __name__=='__main__':
     path=os.path.abspath('.')
     if path=='/root':   #自动运行脚本时 centos7相对路径为/root
@@ -124,11 +149,13 @@ if __name__=='__main__':
         init()
 
     print('begin loop:')
-    nowstamp=datetime.now().timestamp()
-    mail_error=mailpy.Email('1358109029@qq.com','keename@sina.com','MEIYOUSINA')
+    #nowstamp=datetime.now().timestamp()
+    mail_error=mailpy.Email(['1358109029@qq.com'],'keename@sina.com','MEIYOUSINA')
     errortimes=0
+    print(datetime.now())
     while True:
-        errormsg=loop_monitor(nowstamp)
+        #errormsg=loop_monitor_(nowstamp)
+        errormsg=loop_monitor_()
         print('loop_monitor done')
         if not(errormsg):
             print('    错误次数：'+str(errortimes))
