@@ -24,7 +24,16 @@ def Jianlai2dict(obj):
 #'''
 
 path=''
-# isuseproxy=True  则随机生成代理
+
+def output(str1):
+    with open(path+'/run_log_test_11','ab') as f:
+        if(not isinstance(str1,str)):
+            str1=str(str1)
+        str1=str1+'\n'
+        f.write(str1.encode('utf-8'))
+#print=output
+
+# isuseproxy=True  则随机生成代理  或者 直接接受代理参数 proxies
 def get_url(url,isuseproxy=False,proxies=None):
     ua=UserAgent(verify_ssl=False,use_cache_server=False)
     headers={"User-Agent":ua.chrome}
@@ -76,7 +85,7 @@ def get_jlChapcount(proxies):
     url='http://book.zongheng.com/showchapter/672340.html'
     response=get_url(url,proxies=proxies)   # keep-alive   close!
     selector=html.fromstring(response.content)
-    chap=selector.xpath('/html/body/div[3]/div[2]/div[2]/div/ul[@class="chapter-list clearfix"]/li')
+    #chap=selector.xpath('/html/body/div[3]/div[2]/div[2]/div/ul[@class="chapter-list clearfix"]/li')
     lastTitle=selector.xpath('/html/body/div[3]/div[2]/div[2]/div/ul[@class="chapter-list clearfix"]/li/a/text()')
     lastTitle=lastTitle[-1]+"  "+str(len(lastTitle))
     return lastTitle
