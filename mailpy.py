@@ -11,7 +11,7 @@ import socket
 
 #手机收邮件   一个title会归于一个会话
 class Email(object):
-    def __init__(self,to_addr,from_addr='kisaname@126.com',pwd='MIMA123'):
+    def __init__(self,to_addr,from_addr='kisaname@126.com',pwd='MIMA123',useProxy=False):
         self.from_addr=from_addr
         self.password=pwd
         if(not isinstance(to_addr,list)):
@@ -66,21 +66,34 @@ def format_addr(s):
 if __name__=='__main__':
     #测试用   
 
-    em1=Email(['1358109029@qq.com','3414978927@qq.com']);  #email 添加初始值
+    #em1=Email(['1358109029@qq.com','3414978927@qq.com']);  #email 添加初始值
     #em1=Email('1358109029@qq.com');  #email 添加初始值
     msgtxt='剑来章节更新了，第四百七十五章'
     #msgtxt=sys.stdin.read()
     #em1.send_Test()
-   
-    _socket=socket.socket
+    em1=Email(['3414978927@qq.com'],'keename@sina.com','MEIYOUSINA')
+    _socket=socket.socket   #代理时先保存原来的socket，以便恢复（地址传递？能恢复吗？）
+
+
     try:
-        proxyhost,proxyip=proxyip.get_proxyip(proxytype='socket5').split(':')
-        socks.set_default_proxy(socks.PROXY_TYPE_SOCKS5,proxyhost,int(proxyip))
-        #socks.wrapmodule(smtplib)   #局部更新代理
+        '''  #代理
+        proxyhost,proxyip_=proxyip.get_proxyip().split(':')
+        #socks.set_default_proxy(socks.PROXY_TYPE_SOCKS5,proxyhost,int(proxyip_))
+        socks.set_default_proxy(socks.PROXY_TYPE_HTTP,proxyhost,int(proxyip_))
+        
+        socks.wrapmodule(smtplib)   #局部更新代理?
         socket.socket=socks.socksocket
-        print(proxyhost+':'+proxyip)
-        em1.send_Email('服务器通知剑来更新了',msgtxt)
+        print(proxyhost+':'+proxyip_)
+        print(socks.get_default_proxy())
+        '''
+
+        em1.send_Email('剑来更新了',msgtxt)
+
     except Exception as e:
+        print("cathc ")
+        print(e)
+
+'''
         try:
             em1.send_Fail(str(e))
         except Exception as e2:
@@ -88,3 +101,8 @@ if __name__=='__main__':
             em1=Email(['1358109029@qq.com','3414978927@qq.com'],'keename@sina.com','MEIYOUSINA')
             em1.send_Fail("使用代理发送邮件错误")
             print(e)
+'''
+
+
+        #记得 git checkout -- 这个文件
+        #不能发送邮件
