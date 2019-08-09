@@ -65,10 +65,13 @@ def format_addr(s):
 
 if __name__=='__main__':
     #测试用   
-    em1=Email('1358109029@qq.com');  #email 添加初始值
+
+    em1=Email(['1358109029@qq.com','3414978927@qq.com']);  #email 添加初始值
+    #em1=Email('1358109029@qq.com');  #email 添加初始值
     msgtxt='剑来章节更新了，第四百七十五章'
     #msgtxt=sys.stdin.read()
     #em1.send_Test()
+   
     _socket=socket.socket
     try:
         proxyhost,proxyip=proxyip.get_proxyip(proxytype='socket5').split(':')
@@ -82,5 +85,6 @@ if __name__=='__main__':
             em1.send_Fail(str(e))
         except Exception as e2:
             socket.socket=_socket
-            em1=Email('1358109029@qq.com','keename@sina.com','MEIYOUSINA')
+            em1=Email(['1358109029@qq.com','3414978927@qq.com'],'keename@sina.com','MEIYOUSINA')
             em1.send_Fail("使用代理发送邮件错误")
+            print(e)
