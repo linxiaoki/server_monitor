@@ -12,14 +12,16 @@ import random
 
 path=''
 
+after=''
+
 def output(str1):
-    with open(path+'/run_log_test_11','ab') as f:
+    with open(path+'/run_log_test','ab') as f:
         if(not isinstance(str1,str)):
             str1=str(str1)
         str1=str1+'\n'
         f.write(str1.encode('utf-8'))
 
-print=output
+#print=output
 
 def get_url(url,isuseproxy=False,proxies=None):
     print('          >>>>get_url->'+url)
@@ -27,13 +29,22 @@ def get_url(url,isuseproxy=False,proxies=None):
     headers={"User-Agent":ua.chrome}
     if isuseproxy==True:
         proxies=proxyip.get_proxyip()
+        #proxies="109.246.8.122:2997"
+        #proxies='94.177.249.107:80'
         print('          >>>>get_url->proxy:'+proxies)
     #proxies={'http':'socks5://'+proxies_someone,'https':'socks5://'+proxies_someone}  # 没试过
     #proxies={'socket5':proxies_someone}
     proxies={"http":proxies,"Connection":"close"}  # keep-alive:false  测试 
     print('          >>>>get_url->>>>>request 前')
-    response=requests.get(url,headers=headers,proxies=proxies)
-    print('          >>>>get_url->>>>>request 后')
+    before=datetime.now().timestamp()
+
+    global after
+    if(not after==''):
+        print('          >>>>get_url->>>>>经过：'+str(before-after)+'秒后开始新的请求')
+    response=requests.get(url,headers=headers,proxies=proxies,timeout=3)
+    after=datetime.now().timestamp()
+    print(response.status_code)
+    print('          >>>>get_url->>>>>request 后: '+str(after-before)+'秒')
     return response
 
 
@@ -54,8 +65,8 @@ def init():
 # 监测：剑来
 def test_jianlai(d1,proxies):
     print('          test_jianlai 开始')
-    mail_user=mailpy.Email(['1358109029@qq.com'],'keename@sina.com','MEIYOUSINA')
-    #mail_user=mailpy.Email(['1358109029@qq.com','1225517060@qq.com'],'keename@sina.com','MEIYOUSINA')
+    mail_user=mailpy.Email(['3414978927@qq.com'],'keename@sina.com','MEIYOUSINA')
+    #mail_user=mailpy.Email(['3414978927@qq.com','1225517060@qq.com'],'keename@sina.com','MEIYOUSINA')
     url='http://book.zongheng.com/showchapter/672340.html'
     #proxies={"http":proxies}
     #response=requests.get(url,proxies=proxies)
@@ -134,7 +145,7 @@ if __name__=='__main__':
     print('begin loop---')
     print('begin loop:')
     #nowstamp=datetime.now().timestamp()
-    mail_error=mailpy.Email(['1358109029@qq.com'],'keename@sina.com','MEIYOUSINA')
+    mail_error=mailpy.Email(['3414978927@qq.com'],'keename@sina.com','MEIYOUSINA')
     errortimes=0
     print(datetime.now())
     while True:

@@ -47,15 +47,15 @@ def get_proxyip(proxytype='http'):
     now_timestamp=datetime.now().timestamp()
 
     if (modified_timestamp != 0) and (now_timestamp-modified_timestamp)<3600:
-        with open('ini/proxy_list.txt','r') as f:
-            proxy_list=f.read()
-            proxy_list=proxy_list.split('\n\n')[:-1]
+        with open('ini/proxy_list.txt','rb') as f:
+            proxy_list=f.read().decode('utf-8')
+            proxy_list=proxy_list.split('\r\n')[:-1]
     else:
         proxy_list=get_proxyip_file(proxytype)
         if proxy_list is None:
             raise ValueError('invalid proxy value: None.(proxyip.py)')
-        with open('ini/proxy_list.txt','w') as f:
-            f.write(proxy_list)
+        with open('ini/proxy_list.txt','wb') as f:
+            f.write(proxy_list.encode('utf-8'))
         proxy_list=proxy_list.split('\r\n')[:-1] 
     return random.choice(proxy_list)
 
@@ -65,8 +65,8 @@ def sort_proxy():
     pass
 
 if __name__=="__main__":
-    get_proxyip()
-
+    proxy_list=get_proxyip()
+    print(proxy_list)
     '''
     #for test proxyip: get http/socket4/socket5
     ua=UserAgent(verify_ssl=False)
